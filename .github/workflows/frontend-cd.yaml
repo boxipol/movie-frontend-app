@@ -10,7 +10,8 @@ on:
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: frontend-app
-  REACT_APP_MOVIE_API_URL: http://localhost:5000
+  EKS_CLUSTER_NAME: movie-app-cluster
+  REACT_APP_MOVIE_API_URL: http://af1cce3a31cb14810adef1fca16d2d8f-429890749.us-east-1.elb.amazonaws.com
 
 jobs:
   test:
@@ -78,5 +79,17 @@ jobs:
           IMAGE_URI=${ECR_REGISTRY}/${ECR_REPOSITORY}:${{ github.sha }}
 
           echo "Building image: $IMAGE_URI"
-          docker build -t $IMAGE_URI .
+          docker build --build-arg REACT_APP_MOVIE_API_URL=${REACT_APP_MOVIE_API_URL} -t $IMAGE_URI .
           docker push $IMAGE_URI
+
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
+
+      - name: Deploy to EKS
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          IMAGE_URI=${ECR_REGISTRY}/${ECR_REPOSITORY}:${{ github.sha }}
+          sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_URI|g" k8s/deployment.yaml
+          kubectl apply -f k8s/deployment.yaml
