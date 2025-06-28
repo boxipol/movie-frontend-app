@@ -3,16 +3,16 @@ kind: Deployment
 metadata:
   name: frontend-app
   labels:
-    app: Create new scratch file from selection
+    app: frontend-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: Create new scratch file from selection
+      app: frontend-app
   template:
     metadata:
       labels:
-        app: Create new scratch file from selection
+        app: frontend-app
     spec:
       containers:
         - name: frontend-container
