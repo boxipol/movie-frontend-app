@@ -11,7 +11,7 @@ env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: frontend-app
   EKS_CLUSTER_NAME: movie-app-cluster
-  REACT_APP_MOVIE_API_URL: http://localhost:5555
+  REACT_APP_MOVIE_API_URL: http://af1cce3a31cb14810adef1fca16d2d8f-429890749.us-east-1.elb.amazonaws.com
 
 jobs:
   test:
